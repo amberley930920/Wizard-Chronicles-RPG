@@ -164,7 +164,7 @@ function ageAt(birth,date){if(!birth||!date)return null;let b=new Date(birth+"T1
 function toast(s){$("toast").textContent=s;$("toast").style.display="block";setTimeout(()=>$("toast").style.display="none",2300)}
 function addLog(text,kind="事件"){state.log.unshift({date:state.date,kind,text});state.log=state.log.slice(0,100)}
 function startScene(title,eyebrow,paragraphs,choices=[]){state.scene={title,eyebrow,paragraphs,choices};renderScene()}
-function renderScene(){if(!state)return;$("sceneTitle").textContent=state.scene.title;$("sceneEyebrow").textContent=state.scene.eyebrow;$("datePill").textContent=dateFmt(state.date);$("storyText").innerHTML=state.scene.paragraphs.map(p=>`<p class="${p.type||"narration"}">${escapeHtml(p.text)}</p>`).join("");$("choices").innerHTML="";state.scene.choices.forEach((c,i)=>{let b=document.createElement("button");b.innerHTML=`<span class="choiceletter">${String.fromCharCode(65+i)}.</span><span>${escapeHtml(c.label)}</span>`;b.onclick=()=>doAction(c.action||c.label,!state.scene.aiGenerated);$("choices").appendChild(b)});renderSidebar()}
+function renderScene(){if(!state)return;const renderedScene=state.scene;$("sceneTitle").textContent=renderedScene.title;$("sceneEyebrow").textContent=renderedScene.eyebrow;$("datePill").textContent=dateFmt(state.date);$("storyText").innerHTML=renderedScene.paragraphs.map(p=>`<p class="${p.type||"narration"}">${escapeHtml(p.text)}</p>`).join("");$("choices").innerHTML="";renderedScene.choices.forEach((c,i)=>{let b=document.createElement("button");b.type="button";b.innerHTML=`<span class="choiceletter">${String.fromCharCode(65+i)}.</span><span>${escapeHtml(c.label)}</span>`;b.onclick=()=>{if(state.scene!==renderedScene)return;doAction(c.action||c.label,!renderedScene.aiGenerated)};$("choices").appendChild(b)});renderSidebar()}
 function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function renderSidebar(){if(!state)return;let c=state.char;$("sideName").textContent=c.name||"未命名角色";$("sideSub").textContent=`${c.age??"年齡待確認"} 歲 · ${c.year} 年開局`;$("sideDate").textContent=dateFmt(state.date);$("sideLoc").textContent=state.location;$("sideMoney").textContent=state.money+" 加隆";$("sideHouse").textContent=state.house||"未分院";$("crest").textContent=state.house==="葛來分多"?"🦁":state.house==="赫夫帕夫"?"🦡":state.house==="雷文克勞"?"🦅":state.house==="史萊哲林"?"🐍":"✦"}
 function defaultAdmissionYear(birth){
@@ -203,7 +203,7 @@ async function doAIAction(action){
   const button=$("actBtn"), input=$("actionInput"), originalText=button.textContent;
   const requestController=new AbortController();const requestTimeout=setTimeout(()=>requestController.abort(),25000);
   const dateBeforeAI=state.date;const isTimeSummary=hasTimeSkipSummaryAction(action);
-  button.disabled=true; input.disabled=true; button.textContent="AI 正在思考…";
+  button.disabled=true; input.disabled=true; document.querySelectorAll("#choices button").forEach(b=>b.disabled=true); button.textContent="AI 正在思考…";
   try{
     const response=await fetch("/.netlify/functions/game-ai",{
       method:"POST",headers:{"Content-Type":"application/json"},
@@ -244,7 +244,7 @@ async function doAIAction(action){
     toast("這次劇情生成失敗："+detail);
     return false;
   }finally{
-    clearTimeout(requestTimeout);button.disabled=false;input.disabled=false;button.textContent=originalText;
+    clearTimeout(requestTimeout);button.disabled=false;input.disabled=false;document.querySelectorAll("#choices button").forEach(b=>b.disabled=false);button.textContent=originalText;
   }
 }
 function hasTimeSkipSummaryAction(action){return /概括這段期間的重要經歷|概括期間|摘要這段期間/.test(String(action||""))}
@@ -261,12 +261,12 @@ function stripTimeSkipIntent(action){
 }
 async function doAction(raw, fromChoice=false){if(!state){$("setupModal").classList.add("open");return}let a=String(raw).trim();if(!a)return;let c=state.char;let ps=[],choices=[];state.lastAction=a;
 const has=(...terms)=>terms.some(t=>a.toLowerCase().includes(t.toLowerCase()));
-if(has("狀態","角色卡","資料")){showTab("status");return}
-if(has("關係","人物")){showTab("relations");return}
-if(has("物品","背包","行李")){showTab("inventory");return}
-if(has("課表","課程")){showTab("schedule");return}
-if(has("時間線","已發生","進度")){showTab("timeline");return}
-if(has("存檔","保存")){saveGame();return}
+if(/^(查看|打開|開啟|顯示|整理查看)(目前)?(角色狀態|狀態|角色卡)$/.test(a)){showTab("status");return}
+if(/^(查看|打開|開啟|顯示)(目前)?(人物關係|關係)$/.test(a)){showTab("relations");return}
+if(/^(查看|打開|開啟|顯示)(目前)?(物品|物品欄|背包)$/.test(a)){showTab("inventory");return}
+if(/^(查看|打開|開啟|顯示)(目前)?(課表|課程表)$/.test(a)){showTab("schedule");return}
+if(/^(查看|打開|開啟|顯示)(目前)?(事件時間線|時間線|已發生事件)$/.test(a)){showTab("timeline");return}
+if(/^(存檔|保存|儲存遊戲)$/.test(a)){saveGame();return}
 const skip=parseTimeSkipAction(a,state.date,state.year);if(skip){
  if(skip.error){toast(skip.error);startScene("時間沒有改變","時間推進未執行",[{text:skip.error},{text:"請輸入明確的未來日期或時間跨度，例如「跳到開學前一天」、「三天後」或「跳過一個月」。",type:"systemnote"}],[{label:"跳到明天",action:"跳到明天"},{label:"跳到開學前一天",action:"跳到開學前一天"}]);return}
  const from=state.date;const target=skip.date;
@@ -302,20 +302,20 @@ if((has("看看寵物店","前往寵物店","去寵物店","寵物店")&&!has("�
 if(has("貓頭鷹","貓","蟾蜍")&&state.location.includes("寵物店")){let pet=has("貓頭鷹")?"貓頭鷹":has("蟾蜍")?"蟾蜍":"貓";state.pet=pet;if(!state.items.includes(pet))state.items.push(pet);addLog(`選擇了${pet}。`,"寵物");ps=[{text:`你選擇了${pet}。照護用品、個性與名字仍可以再慢慢決定。`},{text:"若想更改選擇，請在自由輸入中說明；遊戲會保留你明確做出的決定。",type:"systemnote"}];choices=[{label:"替牠取名字",action:"替寵物取名字"},{label:"購買照護用品",action:"購買寵物照護用品"},{label:"繼續採買",action:"繼續採買"}];startScene("新的旅伴","斜角巷 · 寵物",ps,choices);return}
 if(has("火車","九又四分之三","霍格華茲特快車")){state.location="國王十字車站";ps=[{text:"國王十字車站裡旅客來來往往。九又四分之三月台並不會向普通旅客公開；你需要依照自己已知的資訊與同行者的指引找到入口。"}];choices=[{label:"尋找九又四分之三月台",action:"尋找九又四分之三月台"},{label:"先確認行李與車票",action:"確認行李與車票"},{label:"觀察其他帶著魔法行李的家庭",action:"觀察其他帶著魔法行李的家庭"}];startScene("前往霍格華茲",`${state.year} 年 9 月 1 日附近 · 車站`,ps,choices);return}
 if((has("繼續採買","採買其他用品")&&String(state.location).includes("斜角巷"))){startScene("繼續採買","斜角巷 · 入學準備",[{text:"你仍在斜角巷，可以接著處理尚未購買的用品。已買過的商品不會重複扣款；尚未選定的商品也不會自動加入物品欄。"}],[{label:"購買課本與校袍",action:"先買齊課本與校袍"},{label:"前往奧利凡德魔杖店",action:"前往奧利凡德魔杖店"},{label:"看看寵物店",action:"看看寵物店"},{label:"查看物品與金錢",action:"查看物品"}]);return}
+if(has("整理入學用品","整理用品","整理行李")){startScene("整理入學用品","家中 · 入學準備",[{text:"你把目前已經準備好的入學用品集中整理，逐項確認哪些已經備妥、哪些還需要採買。尚未購買的物品不會自動加入背包。"},{text:`目前已登記的物品：${state.items.length?state.items.join("、"):"尚無已登記物品"}。`,type:"systemnote"}],[{label:"列出霍格華茲一年級用品清單",action:"列出霍格華茲一年級用品清單"},{label:"與家人討論還缺哪些用品",action:"與家人交談，討論入學用品"},{label:"前往斜角巷採買",action:"前往斜角巷"}]);return}
+if(has("與家人交談","和家人交談","找家人聊聊")){startScene("與家人交談","家中 · 日常",[{text:"家人暫時放下手邊的事，留出時間和你談談。你可以自己決定要從哪個話題開始；目前不會替你決定對話內容，也不會擅自改變家人的背景設定。"}],[{label:"談談霍格華茲與入學通知",action:"詢問家人對霍格華茲與入學通知的看法"},{label:"討論入學用品與預算",action:"與家人交談，討論入學用品與預算"},{label:"聊聊今天的日常",action:"和家人聊聊今天的日常"}]);return}
+if(has("前往斜角巷","去斜角巷","到斜角巷")){state.location="斜角巷";if(!state.visitedPlaces.includes("斜角巷"))state.visitedPlaces.push("斜角巷");if(!state.unlockedPlaces.includes("斜角巷"))state.unlockedPlaces.push("斜角巷");addLog("前往斜角巷，準備採買入學用品。","地點移動");startScene("斜角巷","魔法世界 · 入學採買",[{text:"穿過入口後，斜角巷熱鬧的街景映入眼簾。店舖裡陳列著課本、校袍、坩堝與各式魔法用品。你可以自行決定先去哪一家店，不會在沒有選擇時自動購買商品。"}],[{label:"購買課本與校袍",action:"先買齊課本與校袍"},{label:"前往奧利凡德魔杖店",action:"前往奧利凡德魔杖店"},{label:"看看寵物店",action:"看看寵物店"},{label:"先逛逛其他店鋪",action:"逛逛斜角巷的其他店鋪"}]);saveGame();return}
 if(has("繼續")){ps=[{text:"場景沒有額外強加新事件。你可以沿著目前的目標繼續，也可以自行提出下一個行動。"}];choices=[{label:"整理入學用品",action:"整理入學用品"},{label:"與家人交談",action:"與家人交談"},{label:"前往斜角巷",action:"前往斜角巷"}];startScene("日常繼續","自由行動",ps,choices);return}
 if(has("查看信封","寄件")){ps=[{text:"信封使用厚實的羊皮紙，收件人姓名以深綠色墨水書寫，寄件資訊指向霍格華茲魔法與巫術學院。封口完整，尚未拆開。"}];choices=[{label:"拆開信封",action:"拆開信封"},{label:"拿給家人看",action:"把信拿給家人看"}];startScene("信封上的字跡","入學前",ps,choices);return}
 if(has("拿給家人","詢問家人","媽媽","爸爸","家人")){ps=[{text:"家人停下手邊的事情，先確認信件上的校名與日期。對於霍格華茲的了解會依家庭背景而不同；你可以在自由輸入中指定要問的具體問題。"}];choices=[{label:"詢問霍格華茲的生活",action:"詢問霍格華茲的生活"},{label:"詢問採買要準備多少錢",action:"詢問採買要準備多少錢"},{label:"先讀完入學通知",action:"拆開信封"}];startScene("家人的回應","家中",ps,choices);return}
 if(has("課","練習","學習","讀書","咒語")){let skill=has("變形")?"變形術":has("魔藥")?"魔藥學":has("草藥")?"草藥學":has("飛行")?"飛行":"魔咒學";ps=[{text:`你安排時間進行${skill}相關的閱讀或練習。實際進展取決於目前年級、教材、指導與練習方式；單純宣稱學會某個咒語，不會直接視為熟練。`},{text:"目前這個原型會記錄學習意圖，但尚未模擬完整的課堂判定與逐項技能檢定。",type:"systemnote"}];state.skills[skill]=Math.min(100,(state.skills[skill]||0)+1);addLog(`進行${skill}相關學習，練習紀錄 +1。`,"學習");choices=[{label:"繼續練習",action:`繼續練習${skill}`},{label:"休息一下",action:"休息一下"},{label:"查看能力",action:"查看能力"}];startScene("學習與練習","能力成長",ps,choices);return}
 if(has("休息","睡覺")){let d=new Date(state.date+"T12:00:00");d.setDate(d.getDate()+1);state.date=d.toISOString().slice(0,10);addLog("休息並推進至翌日。","時間推進");startScene("新的一天","日常",[{text:`休息過後，日期來到${dateFmt(state.date)}。`},{text:"你可以繼續既有計畫，或安排新的活動。",type:"systemnote"}],[{label:"繼續原本的計畫",action:"繼續原本的計畫"},{label:"整理角色狀態",action:"查看狀態"}]);return}
-if(has("查看狀態","狀態")){showTab("status");return}
-if(has("查看人物關係")){showTab("relations");return}
-if(has("查看物品")){showTab("inventory");return}
-if(has("查看課表")){showTab("schedule");return}
-if(has("查看時間線")){showTab("timeline");return}
+// 分頁切換只允許在 doAction 開頭以「整句完全符合」的明確指令觸發。
+// 不可使用 includes/has 判斷，否則劇情、自由輸入或選項只要提到「時間線／物品」就會誤切分頁。
 if(has("取名字")){let n=prompt("想替寵物取什麼名字？");if(n){state.pet+=`（${n}）`;addLog(`替寵物取名：${n}。`,"寵物")}startScene("新的旅伴","寵物",[{text:n?`寵物的名字已記為「${n}」。`:"你暫時沒有替牠取名。"}],[{label:"繼續採買",action:"繼續採買"}]);return}
 if(has("跳過","整理行李","普通日常")){let d=new Date(state.date+"T12:00:00");d.setDate(d.getDate()+1);state.date=d.toISOString().slice(0,10);addLog("概括處理日常。","時間推進");startScene("日常已概括","時間推進",[{text:"重複性的日常已簡短帶過，沒有替角色添加未確認的想法或重大經歷。"}],[{label:"繼續",action:"繼續"}]);return}
 const usedAI=await doAIAction(a);if(usedAI)return;
-ps=[{text:`${c.name}決定：${a}。`},{text:"這次行動沒有成功取得 AI 劇情回覆，因此先保留你的輸入與目前狀態。這不一定代表沒有連線；你可以稍後重試，或直接選擇下方的本地行動。",type:"systemnote"}];addLog(`玩家行動：${a}`,"自由行動");choices=[{label:"繼續目前場景",action:"繼續目前場景"},{label:"查看角色狀態",action:"查看狀態"},{label:"查看物品",action:"查看物品"}];startScene("行動紀錄","自由行動",ps,choices)}
+ps=[{text:`${c.name}決定：${a}。`},{text:"這次沒有取得 AI 劇情回覆，遊戲已保留目前日期與角色資料。你可以改用不需要 AI 的本地行動繼續；不會因為生成失敗而被送去其他資料頁面。",type:"systemnote"}];addLog(`玩家行動：${a}`,"自由行動");choices=[{label:"整理入學用品",action:"整理入學用品"},{label:"與家人交談",action:"與家人交談"},{label:"前往斜角巷",action:"前往斜角巷"},{label:"重試剛才的行動",action:a}];startScene("劇情暫時無法生成","本地行動 · 狀態已保留",ps,choices);showTab("story")}
 function showTab(tab){activeTab=tab;$("sceneView").classList.toggle("hidden",tab!=="story");$("tabView").classList.toggle("hidden",tab==="story");document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));if(tab==="story"){renderScene();return}let c=state?.char;if(!state){$("tabView").innerHTML="<div class='tabcontent'><h3>尚未建立角色</h3><p>請先開始新遊戲。</p><button class='primary' id='tabCreateChar'>建立角色</button></div>";let cb=$("tabCreateChar");if(cb)cb.onclick=()=>$("setupModal").classList.add("open");return}let content="";
 const row=(a,b)=>`<div class="data-row"><span>${escapeHtml(a)}</span><span>${escapeHtml(b??"待確認")}</span></div>`;
 if(tab==="map"){
