@@ -20,6 +20,9 @@ export default async (request) => {
 
   const action = String(body?.action || "").trim().slice(0, 1500);
   const state = body?.state || {};
+  const traceId = request.headers.get("x-nf-request-id") || crypto.randomUUID();
+  const startedAt = Date.now();
+  console.info("[game-ai] request-start", JSON.stringify({ traceId, actionLength: action.length, date: state?.date || null, model: (globalThis.Netlify?.env?.get?.("GEMINI_MODEL")) || process.env.GEMINI_MODEL || "gemini-3.5-flash-lite" }));
   if (!action) {
     return Response.json({ error: "請先輸入一個行動。" }, { status: 400 });
   }
@@ -40,7 +43,10 @@ export default async (request) => {
 NPC 有自己的目標、日程、知識限制、偏見、關係與反應。NPC 只知道親眼見過、親耳聽過、被告知或透過合理途徑得知的資訊。人物關係需由互動逐步建立。行動結果可以成功、部分成功、失敗、延遲或帶來代價；不可無條件保證成功，也不可為戲劇性而刻意懲罰玩家。
 
 【長期狀態】
-依提供的角色、日期、年份、位置、物品、技能、人物關係、已知資訊、已開啟地點、近期事件與當前場景延續劇情。不要改動未被玩家行動合理影響的設定。只有明確交易才調整金錢；只有確實取得或得知時才增加物品或資訊；技能變化需有實際學習或練習依據。日期只在玩家明確要求或行動確實耗時時推進。地點只有在玩家真的移動且合理抵達時才更新。
+依提供的角色、日期、年份、位置、物品、技能、人物關係、已知資訊、已開啟地點、近期事件與當前場景延續劇情。不要改動未被玩家行動合理影響的設定。只有明確交易才調整金錢；只有確實取得或得知時才增加物品或資訊；技能變化需有實際學習或練習依據。日期只在玩家明確要求或行動確實耗時時推進，且不得把目前日期改回更早日期。地點只有在玩家真的移動且合理抵達時才更新。
+
+【時間跳躍摘要】
+若 state.timeSkip 存在且玩家要求「概括這段期間的重要經歷」，只簡短整理從 timeSkip.from 到 timeSkip.to 之間合理的日常；不得把未確認的重大事件、購物、物品取得、人物關係變化或角色想法當成既成事實。輸出 date 必須留空或保持 state.date，不要把時間倒退。若玩家明確要求跳時間，直接承認日期已推進，不要再要求玩家重複說明。
 
 【選項必須動態生成】
 每次需要玩家決策時，請依「當前場景、玩家上一個行動、角色背景、地點、時間、已知資訊、近期事件與 NPC 的實際反應」重新構思 3 至 5 個有意義的後續選項。不同回合的選項不應固定重複。避免每次都出現「繼續、查看狀態、查看物品」等泛用選項；除非它們在當下真的有意義。選項要有實質差異，例如觀察線索、詢問特定人物、採取實際行動、處理眼前問題、探索另一方向或暫緩行動；只提供當下合理可做的事，不預先保證成功，也不替玩家決定態度或結果。可依情境提供社交、調查、實務、課業或探索等不同方向，但不要為了湊數加入不合理行動。若近期事件已經提供某個選項，避免原封不動重複。玩家永遠可以自由輸入其他行動。
@@ -73,6 +79,8 @@ choices 通常提供 3 至 5 個，最多 5 個；沒有實質決策的過場可
   const userPrompt = `目前遊戲狀態：\n${JSON.stringify(state).slice(0, 10000)}\n\n玩家這次自由輸入的行動：${action}`;
 
   let apiResponse;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 22000);
   try {
     apiResponse = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
@@ -87,21 +95,31 @@ choices 通常提供 3 至 5 個，最多 5 個；沒有實質決策的過場可
           contents: [{ role: "user", parts: [{ text: userPrompt }] }],
           generationConfig: {
             responseMimeType: "application/json",
-            temperature: 0.9,
-            maxOutputTokens: 1400
+            temperature: 0.7,
+            maxOutputTokens: 1000
           }
-        })
+        }),
+        signal: controller.signal
       }
     );
-  } catch {
-    return Response.json({ error: "無法連線到 Gemini API，請稍後再試。" }, { status: 502 });
+  } catch (error) {
+    const timedOut = error?.name === "AbortError";
+    const durationMs = Date.now() - startedAt;
+    console.error("[game-ai] upstream-fetch-failed", JSON.stringify({ traceId, timedOut, durationMs, errorName: error?.name || "Error" }));
+    return Response.json(
+      { error: timedOut ? "Gemini 回應超過 22 秒，請求已安全停止。時間跳躍功能不受影響，可以稍後重試劇情生成。" : "無法連線到 Gemini API，請稍後再試。", traceId, durationMs },
+      { status: 504 }
+    );
+  } finally {
+    clearTimeout(timeout);
   }
 
   const apiData = await apiResponse.json().catch(() => ({}));
   if (!apiResponse.ok) {
     const message = apiData?.error?.message || `Gemini API 回傳 HTTP ${apiResponse.status}`;
+    console.error("[game-ai] upstream-error", JSON.stringify({ traceId, upstreamStatus: apiResponse.status, durationMs: Date.now() - startedAt, message: message.slice(0, 250) }));
     return Response.json(
-      { error: message.slice(0, 500), upstreamStatus: apiResponse.status },
+      { error: message.slice(0, 500), upstreamStatus: apiResponse.status, traceId, durationMs: Date.now() - startedAt },
       { status: apiResponse.status === 429 ? 429 : 502 }
     );
   }
@@ -112,16 +130,33 @@ choices 通常提供 3 至 5 個，最多 5 個；沒有實質決策的過場可
     .trim();
 
   if (!text) {
-    return Response.json({ error: "Gemini 沒有回傳可用的文字，請再試一次。" }, { status: 502 });
+    const finishReason = apiData?.candidates?.[0]?.finishReason || "unknown";
+    console.error("[game-ai] empty-model-response", JSON.stringify({ traceId, finishReason, durationMs: Date.now() - startedAt }));
+    return Response.json({ error: finishReason === "MAX_TOKENS" ? "Gemini 回應被長度限制截斷，請再試一次。" : "Gemini 沒有回傳可用的文字，請再試一次。", finishReason, traceId, durationMs: Date.now() - startedAt }, { status: 502 });
   }
 
-  try {
-    const result = JSON.parse(text);
-    if (!Array.isArray(result.paragraphs) || result.paragraphs.length === 0) {
-      throw new Error("缺少 paragraphs");
+  let jsonText = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
+  let result = null;
+  try { result = JSON.parse(jsonText); } catch {
+    const firstBrace = jsonText.indexOf("{");
+    const lastBrace = jsonText.lastIndexOf("}");
+    if (firstBrace >= 0 && lastBrace > firstBrace) {
+      try { result = JSON.parse(jsonText.slice(firstBrace, lastBrace + 1)); } catch { result = null; }
     }
-    return Response.json({ result });
-  } catch {
-    return Response.json({ error: "Gemini 回傳格式無法解析，請再試一次。" }, { status: 502 });
   }
+  if (!result || !Array.isArray(result.paragraphs) || result.paragraphs.length === 0) {
+    const finishReason = apiData?.candidates?.[0]?.finishReason || "unknown";
+    console.error("[game-ai] invalid-model-json", JSON.stringify({ traceId, finishReason, durationMs: Date.now() - startedAt, textLength: text.length }));
+    return Response.json({ error: finishReason === "MAX_TOKENS" ? "Gemini 回應被長度限制截斷，請再試一次。" : "Gemini 回傳格式無法解析，請再試一次。", finishReason, traceId, durationMs: Date.now() - startedAt }, { status: 502 });
+  }
+  if (!Array.isArray(result.choices)) result.choices = [];
+  if (typeof result.date !== "string") result.date = "";
+  if (typeof result.location !== "string") result.location = "";
+  if (!Array.isArray(result.itemsAdd)) result.itemsAdd = [];
+  if (!Array.isArray(result.knownAdd)) result.knownAdd = [];
+  if (!Array.isArray(result.placesUnlock)) result.placesUnlock = [];
+  if (!result.skillsDelta || typeof result.skillsDelta !== "object" || Array.isArray(result.skillsDelta)) result.skillsDelta = {};
+  if (!Number.isFinite(Number(result.moneyDelta))) result.moneyDelta = 0;
+  console.info("[game-ai] request-success", JSON.stringify({ traceId, durationMs: Date.now() - startedAt, paragraphs: result.paragraphs.length, choices: result.choices.length }));
+  return Response.json({ result, traceId, durationMs: Date.now() - startedAt });
 };
