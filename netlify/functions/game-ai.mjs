@@ -106,22 +106,54 @@ choices 通常提供 3 至 5 個，最多 5 個；沒有實質決策的過場可
     );
   }
 
-  const text = apiData?.candidates?.[0]?.content?.parts
+  const candidate = apiData?.candidates?.[0];
+  const text = candidate?.content?.parts
     ?.map((part) => part.text || "")
     .join("")
     .trim();
 
   if (!text) {
-    return Response.json({ error: "Gemini 沒有回傳可用的文字，請再試一次。" }, { status: 502 });
+    const reason = candidate?.finishReason || "unknown";
+    const message = reason === "MAX_TOKENS"
+      ? "Gemini 回應超出長度限制，請再試一次。"
+      : "Gemini 沒有回傳可用的文字，請再試一次。";
+    return Response.json({ error: message, finishReason: reason }, { status: 502 });
   }
 
+  // 容忍模型偶爾附上的 Markdown 圍欄，並嘗試擷取 JSON 主體。
+  let jsonText = text
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/, "")
+    .trim();
+
+  let result;
   try {
-    const result = JSON.parse(text);
-    if (!Array.isArray(result.paragraphs) || result.paragraphs.length === 0) {
-      throw new Error("缺少 paragraphs");
-    }
-    return Response.json({ result });
+    result = JSON.parse(jsonText);
   } catch {
-    return Response.json({ error: "Gemini 回傳格式無法解析，請再試一次。" }, { status: 502 });
+    const firstBrace = jsonText.indexOf("{");
+    const lastBrace = jsonText.lastIndexOf("}");
+    if (firstBrace !== -1 && lastBrace > firstBrace) {
+      try {
+        result = JSON.parse(jsonText.slice(firstBrace, lastBrace + 1));
+      } catch {
+        result = null;
+      }
+    }
   }
+
+  if (!result || !Array.isArray(result.paragraphs) || result.paragraphs.length === 0) {
+    const reason = candidate?.finishReason || "unknown";
+    const message = reason === "MAX_TOKENS"
+      ? "Gemini 回應被截斷，請再試一次。"
+      : "Gemini 回傳格式無法解析，請再試一次。";
+    // 只記錄診斷資訊，不記錄玩家行動或完整劇情內容。
+    console.error("Gemini JSON parse failed", {
+      finishReason: reason,
+      textLength: text.length,
+      startsWith: text.slice(0, 80)
+    });
+    return Response.json({ error: message, finishReason: reason }, { status: 502 });
+  }
+
+  return Response.json({ result });
 };
