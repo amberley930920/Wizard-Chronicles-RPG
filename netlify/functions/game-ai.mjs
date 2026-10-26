@@ -80,7 +80,7 @@ choices 通常提供 3 至 5 個，最多 5 個；沒有實質決策的過場可
 
   let apiResponse;
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 22000);
+  const timeout = setTimeout(() => controller.abort(), 35000);
   try {
     apiResponse = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
@@ -107,7 +107,7 @@ choices 通常提供 3 至 5 個，最多 5 個；沒有實質決策的過場可
     const durationMs = Date.now() - startedAt;
     console.error("[game-ai] upstream-fetch-failed", JSON.stringify({ traceId, timedOut, durationMs, errorName: error?.name || "Error" }));
     return Response.json(
-      { error: timedOut ? "Gemini 回應超過 22 秒，請求已安全停止。時間跳躍功能不受影響，可以稍後重試劇情生成。" : "無法連線到 Gemini API，請稍後再試。", traceId, durationMs },
+      { error: timedOut ? "Gemini 回應超過 35 秒，請求已安全停止。時間跳躍功能不受影響，可以稍後重試劇情生成。" : "無法連線到 Gemini API，請稍後再試。", traceId, durationMs },
       { status: 504 }
     );
   } finally {
