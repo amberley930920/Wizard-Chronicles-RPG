@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>魔法人生｜高自由度文字 RPG</title>
+<style>
+:root{--bg:#111713;--panel:#1b241e;--panel2:#222e26;--line:#435347;--gold:#d7bd83;--cream:#f1ead9;--muted:#b6c0b3;--green:#a9c3a7;--danger:#d6a19b}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#24352b 0,#111713 58%);color:var(--cream);font:16px/1.65 Georgia,"Noto Serif TC","PingFang TC",serif;min-height:100vh}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:1px solid var(--line);background:#2b3b30;color:var(--cream);padding:10px 14px;border-radius:9px;transition:.15s}button:hover{border-color:var(--gold);background:#35483a}button.primary{background:var(--gold);color:#1b211b;border-color:var(--gold);font-weight:700}button.subtle{background:transparent}button.danger{color:var(--danger)}button:disabled{opacity:.4;cursor:not-allowed}
+header{max-width:1240px;margin:auto;padding:25px 20px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px} .brand{letter-spacing:.17em;color:var(--gold);font-size:12px}.brandname{font-size:clamp(23px,4vw,34px);margin:3px 0;font-weight:500}.header-note{color:var(--muted);font-size:13px}
+main{max-width:1240px;margin:auto;padding:8px 20px 36px;display:grid;grid-template-columns:250px minmax(0,1fr);gap:18px}
+.panel{background:linear-gradient(160deg,rgba(34,46,38,.97),rgba(24,32,27,.98));border:1px solid var(--line);border-radius:15px;overflow:hidden;box-shadow:0 12px 35px #0002}.panelhead{padding:14px 16px;border-bottom:1px solid var(--line);color:var(--gold);font-size:13px;letter-spacing:.08em;text-transform:uppercase}.sidebar{display:flex;flex-direction:column;gap:14px}.profile{padding:18px}.crest{width:64px;height:72px;border:1px solid var(--gold);border-radius:35px 35px 14px 14px;margin:0 auto 12px;display:grid;place-items:center;font-size:27px;color:var(--gold);background:#17221b}.charname{text-align:center;font-size:20px}.subline{text-align:center;color:var(--muted);font-size:12px;margin-top:2px}.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}.stat{background:#111a14;border:1px solid #344438;padding:9px;border-radius:9px}.stat small{display:block;color:var(--muted);font-size:11px}.stat strong{font-size:14px;font-weight:500}.nav{padding:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px}.nav button{padding:8px 5px;font-size:13px}.nav button.active{border-color:var(--gold);color:var(--gold);background:#303b2f}.content{min-width:0}.scenehead{padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:center}.eyebrow{color:var(--green);font-size:12px;letter-spacing:.12em}.scenehead h2{margin:2px 0;font-size:21px;font-weight:500}.datepill{font-size:12px;border:1px solid var(--line);padding:5px 9px;border-radius:20px;color:var(--muted);white-space:nowrap}.story{padding:23px 22px;min-height:245px}.story p{margin:0 0 13px}.story .narration{color:#e9e2d1}.story .dialogue{padding-left:15px;border-left:2px solid var(--gold);color:#d9d0bb}.story .systemnote{color:var(--muted);font-size:13px}.choices{padding:0 22px 20px;display:grid;gap:8px}.choices button{text-align:left;display:flex;gap:10px;align-items:flex-start}.choiceletter{color:var(--gold);min-width:18px}.freeform{padding:17px 20px;border-top:1px solid var(--line);background:#151e18}.freeform label{display:block;color:var(--gold);font-size:13px;margin-bottom:8px}.freeformrow{display:flex;gap:8px}.freeform input,.field input,.field select,.field textarea{width:100%;background:#111913;color:var(--cream);border:1px solid var(--line);border-radius:8px;padding:11px;outline:none}.freeform input:focus,.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold)}.bottomhint{font-size:12px;color:var(--muted);padding:0 20px 17px}.tabcontent{padding:20px}.tabcontent h3{font-weight:500;color:var(--gold);margin-top:0}.data-list{display:grid;gap:9px}.data-row{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #344438;padding:8px 0}.data-row span:first-child{color:var(--muted)}.tag{display:inline-block;border:1px solid var(--line);border-radius:20px;padding:3px 9px;font-size:12px;margin:3px 4px 3px 0;color:var(--green)}.empty{color:var(--muted);font-size:14px}.logentry{padding:12px 0;border-bottom:1px solid #344438}.logentry small{display:block;color:var(--gold);margin-bottom:4px}.modalback{position:fixed;inset:0;background:#050906d9;display:none;align-items:center;justify-content:center;padding:16px;z-index:10;overflow:auto}.modalback.open{display:flex}.modal{width:min(680px,100%);max-height:94vh;overflow:auto;background:#1b251e;border:1px solid var(--gold);border-radius:16px;padding:22px;box-shadow:0 20px 90px #0009}.modal h2{font-weight:500;margin:0 0 5px}.modal p{color:var(--muted);margin-top:0}.modegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}.mode{padding:13px;text-align:left}.mode.selected{border-color:var(--gold);background:#374535}.mode b{display:block;color:var(--gold);margin-bottom:5px}.mode span{font-size:12px;color:var(--muted)}.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:flex;flex-direction:column;gap:5px}.field label{font-size:13px;color:var(--green)}.field.full{grid-column:1/-1}.modalactions{display:flex;justify-content:space-between;gap:8px;margin-top:20px;flex-wrap:wrap}.notice{border:1px solid #655d43;background:#2a2a20;padding:11px;border-radius:9px;color:#e0d2ad;font-size:13px;margin:12px 0}.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#e7d5a7;color:#172018;padding:10px 16px;border-radius:9px;display:none;z-index:20;font-size:14px}.hidden{display:none!important}footer{text-align:center;color:#7f9082;font-size:11px;padding:0 15px 25px}
+@media(max-width:760px){header{padding:18px 14px 10px}main{padding:6px 12px 25px;grid-template-columns:1fr;gap:12px}.sidebar{display:grid;grid-template-columns:1fr}.profile{padding:13px}.crest{width:48px;height:54px;font-size:21px;margin-bottom:7px}.statgrid{margin-top:10px}.nav{grid-template-columns:repeat(4,1fr)}.nav button{font-size:11px;padding:8px 2px}.story{padding:18px 16px;min-height:180px}.choices{padding:0 16px 16px}.freeform{padding:15px}.scenehead{padding:14px 16px}.modegrid{grid-template-columns:1fr}.fields{grid-template-columns:1fr}.field.full{grid-column:auto}.header-note{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <div><div class="brand">A WIZARDING LIFE · TEXT RPG</div><div class="brandname">魔法人生</div><div class="header-note">世界照常運作，你決定自己的人生。</div></div>
+  <div style="display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end"><button class="subtle" id="saveBtn">存檔</button><button class="subtle" id="loadBtn">讀檔</button><button class="primary" id="newBtn">新遊戲</button></div>
+</header>
+<main>
+  <aside class="sidebar">
+    <section class="panel profile">
+      <div class="crest" id="crest">✦</div><div class="charname" id="sideName">尚未建立角色</div><div class="subline" id="sideSub">等待新故事開始</div>
+      <div class="statgrid">
+        <div class="stat"><small>目前日期</small><strong id="sideDate">未設定</strong></div>
+        <div class="stat"><small>所在位置</small><strong id="sideLoc">未設定</strong></div>
+        <div class="stat"><small>金錢</small><strong id="sideMoney">—</strong></div>
+        <div class="stat"><small>學院</small><strong id="sideHouse">未分院</strong></div>
+      </div>
+    </section>
+    <section class="panel"><div class="panelhead">角色檔案</div><div class="nav" id="nav">
+      <button class="active" data-tab="story">劇情</button><button data-tab="status">角色狀態</button><button data-tab="relations">人物關係</button><button data-tab="inventory">物品</button><button data-tab="schedule">課表</button><button data-tab="timeline">時間線</button><button data-tab="rules">遊戲規則</button><button data-tab="save">存檔管理</button>
+    </div></section>
+  </aside>
+  <section class="panel content">
+    <div id="sceneView">
+      <div class="scenehead"><div><div class="eyebrow" id="sceneEyebrow">新故事尚未開始</div><h2 id="sceneTitle">等待角色建立</h2></div><div class="datepill" id="datePill">—</div></div>
+      <div class="story" id="storyText"><p class="narration">先建立你的原創角色，再進入魔法世界。你可以完全自訂、半自訂，或讓系統隨機生成角色。</p></div>
+      <div class="choices" id="choices"></div>
+      <div class="freeform"><label for="actionInput">你想怎麼做？自由輸入任何行動</label><div class="freeformrow"><input id="actionInput" placeholder="例如：我想問媽媽這封信是怎麼回事……"><button class="primary" id="actBtn">行動</button></div></div>
+      <div class="bottomhint">自由輸入始終有效。選項只是建議，不限制你的行動。</div>
+    </div>
+    <div id="tabView" class="hidden"></div>
+  </section>
+</main>
+<footer>單機原型 · 資料保存在目前瀏覽器 · 本版本使用本機劇情引擎，尚未連接真正的 AI DM 服務</footer>
+
+<div class="modalback open" id="setupModal">
+  <div class="modal">
+    <div class="brand">NEW GAME · CHARACTER CREATION</div><h2>建立你的魔法人生</h2><p>先決定角色建立方式。你可以隨時修改尚未確定的設定。</p>
+    <div class="modegrid">
+      <button class="mode selected" data-mode="custom"><b>完全自訂</b><span>角色資料由你決定，未指定欄位再補充。</span></button>
+      <button class="mode" data-mode="hybrid"><b>半自訂</b><span>填寫核心資料，其餘交給系統生成。</span></button>
+      <button class="mode" data-mode="random"><b>完全隨機</b><span>生成一名符合原著年代與規則的新生。</span></button>
+    </div>
+    <div class="fields" id="characterFields">
+      <div class="field"><label>角色姓名</label><input id="fName" placeholder="尚未決定"></div>
+      <div class="field"><label>性別</label><select id="fGender"><option value="">未指定</option><option>女性</option><option>男性</option><option>非二元／其他</option></select></div>
+      <div class="field"><label>出生日期</label><input id="fBirth" type="date" value=""></div>
+      <div class="field"><label>霍格華茲入學／開局年份（西元）</label><input id="fYear" type="number" inputmode="numeric" step="1" value="1991" placeholder="例如：1971、1991、2017、2030"></div>
+      <div class="field full"><label>時代快速選擇（選填，會自動填入年份）</label><select id="fEraPreset"><option value="">不套用預設，保留上方年份</option><option value="990">約 990｜霍格華茲創校時代（早期設定）</option><option value="1890">1890｜更早期魔法世界（架空／需確認原著背景）</option><option value="1971">1971｜劫盜時代入學</option><option value="1991">1991｜哈利同屆入學</option><option value="1998">1998｜戰後時代</option><option value="2017">2017｜後世代時代參考點</option><option value="2030">2030｜未來世代參考點</option></select></div>
+      <div class="field"><label>血統</label><select id="fBlood"><option value="">未指定</option><option>純血</option><option>混血</option><option>麻瓜出身</option><option>尚未確認</option></select></div>
+      <div class="field"><label>國籍／居住地</label><input id="fHome" placeholder="例如：英國倫敦"></div>
+      <div class="field"><label>家庭經濟</label><select id="fMoney"><option value="">未指定</option><option>拮据</option><option>普通</option><option>寬裕</option><option>富裕</option></select></div>
+      <div class="field"><label>家庭背景／職業</label><input id="fFamily" placeholder="例如：父母職業、家庭成員"></div>
+      <div class="field full"><label>性格、興趣、天賦與弱點</label><textarea id="fTraits" rows="2" placeholder="可以留白，或寫下你想要的角色特質。"></textarea></div>
+      <div class="field full"><label>補充設定（選填）</label><textarea id="fExtra" rows="2" placeholder="任何希望納入角色卡的內容。"></textarea></div>
+    </div>
+    <div class="notice">時間線提示：年份可以自行輸入，不限於上方預設時代。若出生日期留白，系統會暫以入學年份前 11 年的 5 月 14 日作為角色生日；若你選擇非常早期或未來年份，原著角色與事件不會自動照搬，特殊年代可能需要自行確認世界觀。</div>
+    <div class="modalactions"><button id="cancelSetup" class="subtle">返回遊戲</button><button id="createChar" class="primary">建立角色卡並開始</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const $=id=>document.getElementById(id);
+let mode="custom", activeTab="story", state=null;
+const rand=a=>a[Math.floor(Math.random()*a.length)];
+function dateFmt(s){if(!s)return"未設定";let d=new Date(s+"T12:00:00");return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,"0")}/${String(d.getDate()).padStart(2,"0")}`}
+function ageAt(birth,date){if(!birth||!date)return null;let b=new Date(birth+"T12:00:00"),d=new Date(date+"T12:00:00");let a=d.getFullYear()-b.getFullYear();if(d.getMonth()<b.getMonth()||(d.getMonth()===b.getMonth()&&d.getDate()<b.getDate()))a--;return a}
+function toast(s){$("toast").textContent=s;$("toast").style.display="block";setTimeout(()=>$("toast").style.display="none",2300)}
+function addLog(text,kind="事件"){state.log.unshift({date:state.date,kind,text});state.log=state.log.slice(0,100)}
+function startScene(title,eyebrow,paragraphs,choices=[]){state.scene={title,eyebrow,paragraphs,choices};renderScene()}
+function renderScene(){if(!state)return;$("sceneTitle").textContent=state.scene.title;$("sceneEyebrow").textContent=state.scene.eyebrow;$("datePill").textContent=dateFmt(state.date);$("storyText").innerHTML=state.scene.paragraphs.map(p=>`<p class="${p.type||"narration"}">${escapeHtml(p.text)}</p>`).join("");$("choices").innerHTML="";state.scene.choices.forEach((c,i)=>{let b=document.createElement("button");b.innerHTML=`<span class="choiceletter">${String.fromCharCode(65+i)}.</span><span>${escapeHtml(c.label)}</span>`;b.onclick=()=>doAction(c.action||c.label,!state.scene.aiGenerated);$("choices").appendChild(b)});renderSidebar()}
+function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function renderSidebar(){if(!state)return;let c=state.char;$("sideName").textContent=c.name||"未命名角色";$("sideSub").textContent=`${c.age??"年齡待確認"} 歲 · ${c.year} 年開局`;$("sideDate").textContent=dateFmt(state.date);$("sideLoc").textContent=state.location;$("sideMoney").textContent=state.money+" 加隆";$("sideHouse").textContent=state.house||"未分院";$("crest").textContent=state.house==="葛來分多"?"🦁":state.house==="赫夫帕夫"?"🦡":state.house==="雷文克勞"?"🦅":state.house==="史萊哲林"?"🐍":"✦"}
+function createCharacter(){let year=Number($("fYear").value);if(!Number.isInteger(year)||year<1||year>9999){toast("請輸入有效的西元年份（1–9999）");$("fYear").focus();return}let names=["艾琳・摩爾","莉迪亞・貝內特","西奧多・費爾柴德","伊芙琳・伍德","湯瑪斯・惠特克","瑪蒂達・格雷","艾德蒙・派克"];let birth=$("fBirth").value||`${String(year-11).padStart(4,"0")}-05-14`;let c={name:$("fName").value.trim(),gender:$("fGender").value,birth,year,blood:$("fBlood").value,home:$("fHome").value.trim(),familyMoney:$("fMoney").value,family:$("fFamily").value.trim(),traits:$("fTraits").value.trim(),extra:$("fExtra").value.trim()};if(mode==="random"){c.name=rand(names);c.gender=rand(["女性","男性"]);c.birth=`${year-11}-${rand(["02-11","05-14","08-22","10-03","12-17"])}`;c.blood=rand(["純血","混血","麻瓜出身"]);c.home=rand(["英國倫敦","英國約克郡","英國布里斯托","蘇格蘭高地"]);c.familyMoney=rand(["普通","寬裕","拮据"]);c.family=rand(["一位在魔法部任職的家長，另一位從事一般工作","家中有數名兄弟姊妹，日常熱鬧","家人從事魔法相關手藝","成長於麻瓜家庭，對魔法世界仍有許多疑問"]);c.traits=rand(["觀察敏銳，做事謹慎，但不擅長在人前表達","好奇心強，喜歡研究，偶爾過於固執","待人友善，有耐心，但容易把責任攬在自己身上","行動力強，遇到不公平的事很難袖手旁觀"]);c.extra=""}else if(mode==="hybrid"){c.name=c.name||rand(names);c.gender=c.gender||rand(["女性","男性"]);c.blood=c.blood||rand(["純血","混血","麻瓜出身"]);c.home=c.home||"英國";c.familyMoney=c.familyMoney||rand(["普通","寬裕","拮据"]);c.family=c.family||rand(["家中有人從事魔法相關工作","家庭成員各有自己的生活與責任","家人對即將到來的魔法學校生活抱有不同看法"]);c.traits=c.traits||rand(["好奇心強，觀察細膩","安靜謹慎，但熟悉後健談","熱心、有主見，也有需要克服的弱點"])}else{c.name=c.name||"尚未命名角色";c.home=c.home||"英國（待確認）";c.familyMoney=c.familyMoney||"普通";c.blood=c.blood||"尚未確認"}
+let startDate=`${String(year).padStart(4,"0")}-07-24`;let age=ageAt(c.birth,startDate);state={char:{...c,age},year,date:startDate,location:"家中",money:c.familyMoney==="拮据"?4:c.familyMoney==="寬裕"?18:c.familyMoney==="富裕"?35:10,house:null,wand:null,pet:null,items:[],skills:{"變形術":0,"魔咒學":0,"魔藥學":0,"草藥學":0,"黑魔法防禦術":0,"飛行":0},relations:[],schedule:[],log:[],known:[],pending:["入學通知","學用品採買","奧利凡德選杖","前往九又四分之三月台"],done:[],scene:{}};if(age!==11){state.ageWarning=`目前開局日期的計算年齡為 ${age} 歲，與一般一年級入學年齡可能不符。請在角色狀態中確認出生日期或開局年份。`}
+$("setupModal").classList.remove("open");addLog("角色卡建立。未填寫的資料已保留為待確認或以合理背景補充。","角色建立");startScene("一封尚未拆開的信","入學前 · 夏日午後",[{text:`${c.name}的故事即將開始。${c.home?`你目前的家在${c.home}。`:""}窗外是普通的夏日午後，今天原本沒有安排特別的事情。`},{text:"遊戲從入學準備前後開始。角色的想法、感受與行動由你決定；以下選項僅供參考。",type:"systemnote"}],[{label:"查看信封上的寄件資訊",action:"查看信封上的寄件資訊"},{label:"詢問家人是否有自己的信件",action:"詢問家人是否知道這封信"},{label:"先處理手邊的日常，再決定要不要拆信",action:"先處理手邊的日常"},{label:"直接拆開信封",action:"拆開信封"}]);renderSidebar()}
+async function doAIAction(action){
+  const button=$("actBtn"), input=$("actionInput"), originalText=button.textContent;
+  button.disabled=true; input.disabled=true; button.textContent="AI 正在思考…";
+  try{
+    const response=await fetch("/.netlify/functions/game-ai",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({action,state:{
+        character:state.char,date:state.date,year:state.year,location:state.location,
+        money:state.money,house:state.house,wand:state.wand,pet:state.pet,
+        items:state.items,skills:state.skills,known:state.known,pending:state.pending,
+        recentLog:(state.log||[]).slice(0,8),currentScene:state.scene
+      }})
+    });
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(data.error||("HTTP "+response.status));
+    const result=data.result||data;
+    if(!result||!Array.isArray(result.paragraphs)||!result.paragraphs.length)throw new Error("AI 回傳格式不完整");
+    const title=(result.title||"新的發展").slice(0,100);
+    const eyebrow=(result.eyebrow||"自由行動 · Gemini AI").slice(0,100);
+    const paragraphs=result.paragraphs.slice(0,8).map(p=>({text:String(p.text||"").slice(0,3000),type:["narration","dialogue","systemnote"].includes(p.type)?p.type:"narration"}));
+    const nextChoices=Array.isArray(result.choices)?result.choices.slice(0,4).map(c=>({label:String(c.label||c.action||"繼續").slice(0,100),action:String(c.action||c.label||"繼續").slice(0,200)})):[];
+    if(typeof result.location==="string"&&result.location.trim())state.location=result.location.slice(0,100);
+    if(typeof result.date==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(result.date)){
+      const dt=new Date(result.date+"T12:00:00");
+      if(!Number.isNaN(dt.getTime())&&dt.getFullYear()>=1&&dt.getFullYear()<=9999)state.date=result.date;
+    }
+    if(Array.isArray(result.itemsAdd))for(const item of result.itemsAdd.slice(0,5)){const v=String(item).slice(0,100);if(v&&!state.items.includes(v))state.items.push(v)}
+    if(Array.isArray(result.knownAdd))for(const item of result.knownAdd.slice(0,5)){const v=String(item).slice(0,150);if(v&&!state.known.includes(v))state.known.push(v)}
+    if(result.moneyDelta!==undefined){const delta=Number(result.moneyDelta);if(Number.isFinite(delta)&&Math.abs(delta)<=1000)state.money=Math.max(0,Math.min(99999,state.money+Math.trunc(delta)))}
+    if(result.skillsDelta&&typeof result.skillsDelta==="object")for(const [skill,value] of Object.entries(result.skillsDelta)){if(Object.prototype.hasOwnProperty.call(state.skills,skill)){const n=Number(value);if(Number.isFinite(n)&&Math.abs(n)<=10)state.skills[skill]=Math.max(0,Math.min(100,(state.skills[skill]||0)+Math.trunc(n)))}}
+    addLog("玩家行動："+action,"自由行動");
+    state.scene={title,eyebrow,paragraphs,choices:nextChoices,aiGenerated:true};
+    saveGame();renderScene();showTab("story");
+    return true;
+  }catch(err){
+    console.error("Gemini AI error:",err);
+    toast("AI 連線失敗，先使用原本遊戲分支："+String(err.message||err).slice(0,100));
+    return false;
+  }finally{
+    button.disabled=false;input.disabled=false;button.textContent=originalText;
+  }
+}
+async function doAction(raw, fromChoice=false){if(!state){$("setupModal").classList.add("open");return}let a=String(raw).trim();if(!a)return;let c=state.char;let ps=[],choices=[];state.lastAction=a;
+const has=(...terms)=>terms.some(t=>a.toLowerCase().includes(t.toLowerCase()));
+if(has("狀態","角色卡","資料")){showTab("status");return}
+if(has("關係","人物")){showTab("relations");return}
+if(has("物品","背包","行李")){showTab("inventory");return}
+if(has("課表","課程")){showTab("schedule");return}
+if(has("時間線","已發生","進度")){showTab("timeline");return}
+if(has("存檔","保存")){saveGame();return}
+if(has("跳到","明天","週末","火車到站","直接到")){let d=new Date(state.date+"T12:00:00");if(has("明天"))d.setDate(d.getDate()+1);else if(has("週末"))d.setDate(d.getDate()+((6-d.getDay()+7)%7||7));else if(has("火車到站")){state.location="霍格華茲特快車";d=new Date(`${state.year}-09-01T12:00:00`);state.pending=state.pending.filter(x=>x!=="前往九又四分之三月台")}else{let m=a.match(/(\d{4})[\/年-](\d{1,2})[\/月-](\d{1,2})/);if(m)d=new Date(+m[1],+m[2]-1,+m[3],12)}state.date=d.toISOString().slice(0,10);addLog("時間依玩家要求推進。","時間推進");ps=[{text:`時間推進至${dateFmt(state.date)}。這段期間沒有自動添加未經確認的重大經歷。`},{text:"你可以繼續當前的事情，或指定下一個想前往的時間與地點。",type:"systemnote"}];choices=[{label:"繼續目前的事情",action:"繼續目前的事情"},{label:"查看目前狀態",action:"查看狀態"}];startScene("時間向前推進","時間跳躍",ps,choices);return}
+if(!fromChoice){const usedAI=await doAIAction(a);if(usedAI)return;}
+if(has("拆開","打開信","讀信")){state.location="家中";state.known.push("收到霍格華茲入學通知");state.items.push("霍格華茲入學通知");state.pending=state.pending.filter(x=>x!=="入學通知");addLog("拆開信封並讀到霍格華茲入學通知。");ps=[{text:"信封裡是一封正式的入學通知。信上列出開學日期、所需課本與用品，以及前往霍格華茲的基本安排。信紙的格式正式，末尾附有校方聯絡資訊。"},{text:"信件已加入已知資訊與物品紀錄。至於你如何回應，仍由你決定。",type:"systemnote"}];choices=[{label:"把信拿給家人看",action:"把信拿給家人看"},{label:"仔細讀完用品清單",action:"仔細讀完用品清單"},{label:"詢問家人關於霍格華茲的事",action:"詢問家人關於霍格華茲的事"},{label:"先不做決定，保留信件",action:"先不做決定，保留信件"}];startScene("霍格華茲入學通知","入學前 · 重要事件",ps,choices);return}
+if(has("用品","採買","斜角巷","對角巷")){state.location="斜角巷";if(!state.done.includes("採買")){state.items.push("《標準咒語，初級》","《魔法史》","《魔法理論》","校袍（待量身）");state.done.push("採買");state.pending=state.pending.filter(x=>x!=="學用品採買");addLog("開始採買入學用品，部分用品已列入物品欄。","採買")}ps=[{text:"斜角巷的人潮沿著石板路緩緩移動，各家店鋪忙著準備新學年的生意。課本、校袍、坩堝與其他用品需要逐項確認；不同店鋪的價格與品質也不盡相同。"},{text:"原型先提供基本採買紀錄；細部商品、價格與交易會依你後續選擇繼續處理。",type:"systemnote"}];choices=[{label:"前往奧利凡德魔杖店",action:"前往奧利凡德魔杖店"},{label:"先買齊課本與校袍",action:"先買齊課本與校袍"},{label:"看看寵物店",action:"看看寵物店"},{label:"查看物品與金錢",action:"查看物品"}];startScene("入學用品採買","斜角巷",ps,choices);return}
+if(has("奧利凡德","魔杖","選杖")){state.location="奧利凡德魔杖店";if(!state.wand){state.wand={wood:"山楂木",core:"獨角獸毛",length:"10¾ 英吋",flex:"略有彈性",status:"待劇情確認"};state.pending=state.pending.filter(x=>x!=="奧利凡德選杖");}addLog("到訪奧利凡德魔杖店；魔杖細節仍待互動確認。","重要物品");ps=[{text:"店裡高聳的盒子一直延伸到天花板。奧利凡德先生從櫃檯後走出來，詢問你的慣用手與一些基本情況，接著開始挑選可能合適的魔杖。"},{text:"魔杖的回應需要透過試選過程確認；目前不把任何一根魔杖視為已正式購得。",type:"systemnote"}];choices=[{label:"回答奧利凡德的問題",action:"回答奧利凡德的問題"},{label:"詢問魔杖木材與杖芯的差異",action:"詢問魔杖木材與杖芯的差異"},{label:"依照他的指示試用魔杖",action:"依照指示試用魔杖"}];startScene("奧利凡德魔杖店","斜角巷 · 魔杖選擇",ps,choices);return}
+if(has("寵物")){state.location="斜角巷寵物店";ps=[{text:"店裡傳來貓叫、鳥鳴與籠子輕微碰撞的聲音。選擇寵物時，也要考慮照護方式、旅途安排與學校規定。"}];choices=[{label:"看看貓",action:"看看貓"},{label:"看看貓頭鷹",action:"看看貓頭鷹"},{label:"看看蟾蜍",action:"看看蟾蜍"},{label:"暫時不買寵物",action:"暫時不買寵物"}];startScene("挑選寵物","斜角巷",ps,choices);return}
+if(has("貓頭鷹","貓","蟾蜍")&&state.location.includes("寵物店")){let pet=has("貓頭鷹")?"貓頭鷹":has("蟾蜍")?"蟾蜍":"貓";state.pet=pet;if(!state.items.includes(pet))state.items.push(pet);addLog(`選擇了${pet}。`,"寵物");ps=[{text:`你選擇了${pet}。照護用品、個性與名字仍可以再慢慢決定。`},{text:"若想更改選擇，請在自由輸入中說明；遊戲會保留你明確做出的決定。",type:"systemnote"}];choices=[{label:"替牠取名字",action:"替寵物取名字"},{label:"購買照護用品",action:"購買寵物照護用品"},{label:"繼續採買",action:"繼續採買"}];startScene("新的旅伴","斜角巷 · 寵物",ps,choices);return}
+if(has("火車","九又四分之三","霍格華茲特快車")){state.location="國王十字車站";ps=[{text:"國王十字車站裡旅客來來往往。九又四分之三月台並不會向普通旅客公開；你需要依照自己已知的資訊與同行者的指引找到入口。"}];choices=[{label:"尋找九又四分之三月台",action:"尋找九又四分之三月台"},{label:"先確認行李與車票",action:"確認行李與車票"},{label:"觀察其他帶著魔法行李的家庭",action:"觀察其他帶著魔法行李的家庭"}];startScene("前往霍格華茲",`${state.year} 年 9 月 1 日附近 · 車站`,ps,choices);return}
+if(has("繼續")){ps=[{text:"場景沒有額外強加新事件。你可以沿著目前的目標繼續，也可以自行提出下一個行動。"}];choices=[{label:"整理入學用品",action:"整理入學用品"},{label:"與家人交談",action:"與家人交談"},{label:"前往斜角巷",action:"前往斜角巷"}];startScene("日常繼續","自由行動",ps,choices);return}
+if(has("查看信封","寄件")){ps=[{text:"信封使用厚實的羊皮紙，收件人姓名以深綠色墨水書寫，寄件資訊指向霍格華茲魔法與巫術學院。封口完整，尚未拆開。"}];choices=[{label:"拆開信封",action:"拆開信封"},{label:"拿給家人看",action:"把信拿給家人看"}];startScene("信封上的字跡","入學前",ps,choices);return}
+if(has("拿給家人","詢問家人","媽媽","爸爸","家人")){ps=[{text:"家人停下手邊的事情，先確認信件上的校名與日期。對於霍格華茲的了解會依家庭背景而不同；你可以在自由輸入中指定要問的具體問題。"}];choices=[{label:"詢問霍格華茲的生活",action:"詢問霍格華茲的生活"},{label:"詢問採買要準備多少錢",action:"詢問採買要準備多少錢"},{label:"先讀完入學通知",action:"拆開信封"}];startScene("家人的回應","家中",ps,choices);return}
+if(has("課","練習","學習","讀書","咒語")){let skill=has("變形")?"變形術":has("魔藥")?"魔藥學":has("草藥")?"草藥學":has("飛行")?"飛行":"魔咒學";ps=[{text:`你安排時間進行${skill}相關的閱讀或練習。實際進展取決於目前年級、教材、指導與練習方式；單純宣稱學會某個咒語，不會直接視為熟練。`},{text:"目前這個原型會記錄學習意圖，但尚未模擬完整的課堂判定與逐項技能檢定。",type:"systemnote"}];state.skills[skill]=Math.min(100,(state.skills[skill]||0)+1);addLog(`進行${skill}相關學習，練習紀錄 +1。`,"學習");choices=[{label:"繼續練習",action:`繼續練習${skill}`},{label:"休息一下",action:"休息一下"},{label:"查看能力",action:"查看能力"}];startScene("學習與練習","能力成長",ps,choices);return}
+if(has("休息","睡覺")){let d=new Date(state.date+"T12:00:00");d.setDate(d.getDate()+1);state.date=d.toISOString().slice(0,10);addLog("休息並推進至翌日。","時間推進");startScene("新的一天","日常",[{text:`休息過後，日期來到${dateFmt(state.date)}。`},{text:"你可以繼續既有計畫，或安排新的活動。",type:"systemnote"}],[{label:"繼續原本的計畫",action:"繼續原本的計畫"},{label:"整理角色狀態",action:"查看狀態"}]);return}
+if(has("查看狀態","狀態")){showTab("status");return}
+if(has("查看人物關係")){showTab("relations");return}
+if(has("查看物品")){showTab("inventory");return}
+if(has("查看課表")){showTab("schedule");return}
+if(has("查看時間線")){showTab("timeline");return}
+if(has("取名字")){let n=prompt("想替寵物取什麼名字？");if(n){state.pet+=`（${n}）`;addLog(`替寵物取名：${n}。`,"寵物")}startScene("新的旅伴","寵物",[{text:n?`寵物的名字已記為「${n}」。`:"你暫時沒有替牠取名。"}],[{label:"繼續採買",action:"繼續採買"}]);return}
+if(has("跳過","整理行李","普通日常")){let d=new Date(state.date+"T12:00:00");d.setDate(d.getDate()+1);state.date=d.toISOString().slice(0,10);addLog("概括處理日常。","時間推進");startScene("日常已概括","時間推進",[{text:"重複性的日常已簡短帶過，沒有替角色添加未確認的想法或重大經歷。"}],[{label:"繼續",action:"繼續"}]);return}
+ps=[{text:`${c.name}決定：${a}。`},{text:"這個單機原型已記錄你的行動。由於尚未連接真正的 AI DM，無法像完整語言模型一樣理解所有自由輸入並持續模擬複雜人物行為。你仍可使用上方模組查看資料，或繼續輸入下一個行動。",type:"systemnote"}];addLog(`玩家行動：${a}`,"自由行動");choices=[{label:"繼續目前場景",action:"繼續目前場景"},{label:"查看角色狀態",action:"查看狀態"},{label:"查看物品",action:"查看物品"}];startScene("行動紀錄","自由行動",ps,choices)}
+function showTab(tab){activeTab=tab;$("sceneView").classList.toggle("hidden",tab!=="story");$("tabView").classList.toggle("hidden",tab==="story");document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));if(tab==="story"){renderScene();return}let c=state?.char;if(!state){$("tabView").innerHTML="<div class='tabcontent'><h3>尚未建立角色</h3><p>請先開始新遊戲。</p><button class='primary' id='tabCreateChar'>建立角色</button></div>";let cb=$("tabCreateChar");if(cb)cb.onclick=()=>$("setupModal").classList.add("open");return}let content="";
+const row=(a,b)=>`<div class="data-row"><span>${escapeHtml(a)}</span><span>${escapeHtml(b??"待確認")}</span></div>`;
+if(tab==="status")content=`<h3>角色狀態</h3><div class="data-list">${row("姓名",c.name)}${row("性別",c.gender||"未指定")}${row("出生日期",c.birth)}${row("目前年齡",c.age+" 歲（以開局日期計算）")}${row("年份／日期",dateFmt(state.date))}${row("血統",c.blood)}${row("國籍／居住地",c.home)}${row("家庭經濟",c.familyMoney)}${row("家庭背景",c.family)}${row("性格／興趣／天賦",c.traits)}${row("補充設定",c.extra)}${row("目前位置",state.location)}${row("金錢",state.money+" 加隆")}${row("學院",state.house||"尚未分院")}${row("魔杖",state.wand?JSON.stringify(state.wand):"尚未取得")}${row("寵物",state.pet||"尚未選擇")}</div>${state.ageWarning?`<div class="notice">${escapeHtml(state.ageWarning)}</div>`:""}<h3 style="margin-top:20px">能力紀錄</h3><div class="data-list">${Object.entries(state.skills).map(([k,v])=>row(k,`練習紀錄 ${v}（非官方能力評分）`)).join("")}</div>`;
+if(tab==="relations")content=`<h3>人物關係</h3><p class="empty">只記錄實際建立的關係，不會因為選擇某個人物就自動成為朋友。</p>${state.relations.length?state.relations.map(r=>`<div class="data-row"><span>${escapeHtml(r.name)}</span><span>${escapeHtml(r.type)} · ${escapeHtml(r.note)}</span></div>`).join(""):'<p class="empty">目前尚未建立重要人物關係。你可以在自由輸入中描述與某位人物的實際互動。</p>'}`;
+if(tab==="inventory")content=`<h3>物品與資源</h3><div class="data-row"><span>金錢</span><span>${state.money} 加隆（原型初始估值）</span></div><div class="data-list">${state.items.length?state.items.map(x=>`<div class="data-row"><span>${escapeHtml(x)}</span><span>持有／紀錄中</span></div>`).join(""):'<p class="empty">目前沒有登記物品。</p>'}</div><h3 style="margin-top:20px">待處理的入學事項</h3>${state.pending.map(x=>`<span class="tag">${escapeHtml(x)}</span>`).join("")||'<p class="empty">沒有待處理事項。</p>'}`;
+if(tab==="schedule")content=`<h3>課表</h3><p class="empty">課表會依年份、年級、選課與教師安排逐步建立。尚未入學時不會預先填滿整個學年。</p><div class="notice">原著課程制度：一年級包含變形術、魔咒學、黑魔法防禦術、魔藥學、草藥學、魔法史、天文學與飛行課；三年級起依制度選修。</div>`;
+if(tab==="timeline")content=`<h3>事件時間線</h3><div class="data-list">${state.log.length?state.log.map(l=>`<div class="logentry"><small>${dateFmt(l.date)} · ${escapeHtml(l.kind)}</small>${escapeHtml(l.text)}</div>`).join(""):'<p class="empty">尚無事件紀錄。</p>'}</div><h3 style="margin-top:20px">原著時間錨點</h3><div class="data-list">${row("1991–1992","《神秘的魔法石》")}${row("1992–1993","《消失的密室》")}${row("1993–1994","《阿茲卡班的逃犯》")}${row("1994–1995","《火盃的考驗》")}${row("1995–1996","《鳳凰會的密令》")}${row("1996–1997","《混血王子的背叛》")}${row("1997–1998","《死神的聖物》")}</div>`;
+if(tab==="rules")content=`<h3>遊戲規則</h3><div class="data-list"><div class="logentry"><b>玩家自主權</b><br>不替角色決定想法、感受、對話或行動。</div><div class="logentry"><b>原著與因果</b><br>重大事件依原著時間線發展；合理行動可影響局部結果。</div><div class="logentry"><b>自由輸入</b><br>選項只是建議。任何合理行動都可以直接輸入。</div><div class="logentry"><b>狀態紀錄</b><br>日期、地點、金錢、物品、能力與事件紀錄會保存到本機。</div><div class="notice">AI 連線說明：部署至 Netlify 並設定 GEMINI_API_KEY 後，自由輸入的行動會交給 Gemini 生成劇情；畫面上的預設選項仍保留原本的固定分支，方便維持角色狀態與遊戲紀錄。</div></div>`;
+if(tab==="save")content=`<h3>存檔管理</h3><p>存檔會保存在這個瀏覽器的本機儲存空間。清除瀏覽器資料或更換裝置可能導致存檔無法取回，建議另行下載 JSON 備份。</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="primary" onclick="saveGame()">儲存至本機</button><button onclick="exportSave()">下載存檔 JSON</button><label class="subtle" style="display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:9px;padding:9px 12px;cursor:pointer">匯入存檔<input type="file" id="importFile" accept=".json,application/json" style="display:none" onchange="importSave(event)"></label><button class="danger" onclick="clearSave()">刪除本機存檔</button></div><p id="saveInfo" class="empty" style="margin-top:14px"></p>`;
+$("tabView").innerHTML=`<div class="tabcontent">${content}</div>`;if(tab==="save"){$("saveInfo").textContent=localStorage.getItem("wizardLifeSave")?"找到本機存檔。":"目前沒有本機存檔。";}}
+function saveGame(){if(!state){toast("目前沒有可儲存的遊戲");return}localStorage.setItem("wizardLifeSave",JSON.stringify(state));toast("已儲存至本機瀏覽器")}
+function loadGame(){let s=localStorage.getItem("wizardLifeSave");if(!s){toast("沒有找到本機存檔");return}try{state=JSON.parse(s);renderSidebar();renderScene();showTab("story");$("setupModal").classList.remove("open");toast("存檔載入成功")}catch(e){toast("存檔格式無法讀取")}}
+function exportSave(){if(!state){toast("請先建立角色");return}let blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`魔法人生存檔_${state.char.name||"角色"}.json`;a.click();URL.revokeObjectURL(url)}
+function importSave(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let s=JSON.parse(r.result);if(!s.char||!s.scene)throw Error();state=s;renderSidebar();renderScene();showTab("story");saveGame();toast("存檔匯入成功")}catch(err){toast("檔案不是有效的魔法人生存檔")}};r.readAsText(f)}
+function clearSave(){if(confirm("確定刪除這個瀏覽器中的魔法人生存檔？此操作無法復原。")){localStorage.removeItem("wizardLifeSave");toast("本機存檔已刪除");showTab("save")}}
+document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;document.querySelectorAll(".mode").forEach(x=>x.classList.toggle("selected",x===b));$("characterFields").classList.toggle("hidden",mode==="random")});
+$("fEraPreset").addEventListener("change",()=>{if($("fEraPreset").value)$("fYear").value=$("fEraPreset").value});
+$("createChar").onclick=createCharacter;$("cancelSetup").onclick=()=>$("setupModal").classList.remove("open");$("newBtn").onclick=()=>$("setupModal").classList.add("open");$("saveBtn").onclick=saveGame;$("loadBtn").onclick=loadGame;$("actBtn").onclick=()=>{let v=$("actionInput").value;$("actionInput").value="";doAction(v)};$("actionInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("actBtn").click()});document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+if(localStorage.getItem("wizardLifeSave")){try{state=JSON.parse(localStorage.getItem("wizardLifeSave"));renderSidebar();renderScene();$("setupModal").classList.remove("open")}catch(e){}}
+</script>
+</body>
+</html>
